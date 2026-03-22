@@ -13,6 +13,7 @@ let timerId;
 let dotsId;
 
 const humanSize = (bytes) => `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+const metadataEl = document.getElementById("metadata");
 
 const setStatus = (message, isError = false) => {
   statusEl.textContent = message;
@@ -73,6 +74,9 @@ convertBtn.addEventListener("click", async () => {
   downloadBtn.disabled = true;
   convertBtn.disabled = true;
   startProgress();
+  setStatus("Converting...");
+  metadataEl.textContent = "";
+  downloadBtn.disabled = true;
 
   try {
     const res = await fetch(`${apiBaseUrl}/convert`, {
@@ -83,6 +87,7 @@ convertBtn.addEventListener("click", async () => {
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
       throw new Error(err.detail || `Conversion failed (HTTP ${res.status}).`);
+      throw new Error(err.detail || "Conversion failed.");
     }
 
     const data = await res.json();
@@ -96,6 +101,7 @@ convertBtn.addEventListener("click", async () => {
       const mb = data.metadata.file_size_mb ?? "n/a";
       metadataEl.textContent =
         `Pages: ${pageCount} • Figures: ${figureCount} • File: ${mb} MB • Text size: ${chars} chars • Server time: ${seconds}s`;
+      metadataEl.textContent = `Pages: ${pageCount} • Figures: ${figureCount}`;
     }
 
     downloadBtn.disabled = !markdownOutput.value;

@@ -4,6 +4,11 @@ from io import BytesIO
 from pathlib import Path
 from typing import Any
 
+from io import BytesIO
+from typing import Any
+
+from pathlib import Path
+
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
@@ -21,6 +26,7 @@ class ConvertResponse(BaseModel):
 
 
 app = FastAPI(title="PDF to Markdown API", version="0.2.0")
+app = FastAPI(title="PDF to Markdown API", version="0.1.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -29,6 +35,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 FRONTEND_DIR = Path(__file__).resolve().parent.parent / "frontend"
 
@@ -76,6 +83,7 @@ async def convert_pdf(file: UploadFile = File(...)) -> ConvertResponse:
         raise HTTPException(status_code=400, detail="Invalid PDF file.") from exc
 
     sections: list[str] = []
+    page_count = len(reader.pages)
 
     for idx, page in enumerate(reader.pages, start=1):
         text = (page.extract_text() or "").strip()
@@ -94,6 +102,11 @@ async def convert_pdf(file: UploadFile = File(...)) -> ConvertResponse:
         "processing_seconds": elapsed,
         "character_count": len(markdown),
         "server_limit_mb": MAX_PDF_SIZE_MB,
+
+    metadata = {
+        "page_count": page_count,
+        # Figure extraction is intentionally not implemented in this minimal example.
+        "figure_count": 0,
     }
 
     return ConvertResponse(markdown=markdown, metadata=metadata)
