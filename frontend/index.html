@@ -33,11 +33,22 @@
 
       #status {
         margin-top: 0.75rem;
+        font-weight: 600;
       }
 
       .meta {
         margin-top: 0.5rem;
         color: #444;
+      }
+
+      #progress {
+        margin-top: 0.4rem;
+        color: #555;
+      }
+
+      #fileInfo {
+        margin-top: 0.5rem;
+        color: #1f2937;
       }
     </style>
   </head>
@@ -50,6 +61,9 @@
       <button id="downloadBtn" disabled>Download .md</button>
     </div>
 
+    <div id="fileInfo"></div>
+    <div id="status"></div>
+    <div id="progress"></div>
     <div id="status"></div>
     <div id="metadata" class="meta"></div>
 

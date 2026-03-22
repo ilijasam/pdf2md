@@ -1,3 +1,9 @@
+import os
+import time
+from io import BytesIO
+from pathlib import Path
+from typing import Any
+
 from io import BytesIO
 from typing import Any
 
@@ -10,12 +16,16 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from pypdf import PdfReader
 
+MAX_PDF_SIZE_MB = int(os.getenv("MAX_PDF_SIZE_MB", "20"))
+MAX_PDF_BYTES = MAX_PDF_SIZE_MB * 1024 * 1024
+
 
 class ConvertResponse(BaseModel):
     markdown: str
     metadata: dict[str, Any] | None = None
 
 
+app = FastAPI(title="PDF to Markdown API", version="0.2.0")
 app = FastAPI(title="PDF to Markdown API", version="0.1.0")
 
 app.add_middleware(
@@ -48,12 +58,24 @@ def health() -> dict[str, str]:
 
 @app.post("/convert", response_model=ConvertResponse)
 async def convert_pdf(file: UploadFile = File(...)) -> ConvertResponse:
+    started = time.perf_counter()
+
     if file.content_type not in {"application/pdf", "application/x-pdf"}:
         raise HTTPException(status_code=400, detail="Only PDF uploads are supported.")
 
     raw = await file.read()
     if not raw:
         raise HTTPException(status_code=400, detail="Uploaded file is empty.")
+
+    file_size_bytes = len(raw)
+    if file_size_bytes > MAX_PDF_BYTES:
+        raise HTTPException(
+            status_code=413,
+            detail=(
+                f"File too large ({file_size_bytes / (1024 * 1024):.2f} MB). "
+                f"Current server limit is {MAX_PDF_SIZE_MB} MB."
+            ),
+        )
 
     try:
         reader = PdfReader(BytesIO(raw))
@@ -70,6 +92,16 @@ async def convert_pdf(file: UploadFile = File(...)) -> ConvertResponse:
         sections.append(f"## Page {idx}\n\n{text}")
 
     markdown = "# Converted Markdown\n\n" + "\n\n".join(sections)
+    elapsed = round(time.perf_counter() - started, 3)
+
+    metadata = {
+        "page_count": len(reader.pages),
+        # Figure extraction is intentionally not implemented in this minimal example.
+        "figure_count": 0,
+        "file_size_mb": round(file_size_bytes / (1024 * 1024), 3),
+        "processing_seconds": elapsed,
+        "character_count": len(markdown),
+        "server_limit_mb": MAX_PDF_SIZE_MB,
 
     metadata = {
         "page_count": page_count,

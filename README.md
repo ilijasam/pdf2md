@@ -211,7 +211,7 @@ Then open `http://<your-server-ip>:8000` (or HTTPS via your platform proxy).
 ### API Contract
 
 **Endpoint:** `POST /convert`  
-**URL:** `http://127.0.0.1:8000/convert`  
+**URL:** `https://<your-domain>/convert` (or local `http://127.0.0.1:8000/convert`)  
 **Content-Type:** `multipart/form-data`
 
 **Request form field**
@@ -231,6 +231,9 @@ Then open `http://<your-server-ip>:8000` (or HTTPS via your platform proxy).
 
 **Error responses**
 - `400` when non-PDF or invalid/empty file is uploaded
+- `413` when uploaded file exceeds server max size (`MAX_PDF_SIZE_MB`, default 20 MB)
+
+UI now shows conversion-in-progress status, elapsed time, selected file size, and backend processing time/character count metadata to help diagnose slow large files.
 
 ---
 
