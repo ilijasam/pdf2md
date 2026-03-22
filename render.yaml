@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: pdf2md
+    runtime: docker
+    plan: free
+    healthCheckPath: /health

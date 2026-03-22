@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PDF → Markdown</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 2rem auto;
+        max-width: 900px;
+        padding: 0 1rem;
+      }
+
+      .row {
+        display: flex;
+        gap: 0.75rem;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
+      button {
+        padding: 0.5rem 0.9rem;
+        cursor: pointer;
+      }
+
+      textarea {
+        width: 100%;
+        min-height: 350px;
+        margin-top: 1rem;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      }
+
+      #status {
+        margin-top: 0.75rem;
+      }
+
+      .meta {
+        margin-top: 0.5rem;
+        color: #444;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>PDF → Markdown Converter</h1>
+
+    <div class="row">
+      <input id="pdfInput" type="file" accept="application/pdf" />
+      <button id="convertBtn">Convert</button>
+      <button id="downloadBtn" disabled>Download .md</button>
+    </div>
+
+    <div id="status"></div>
+    <div id="metadata" class="meta"></div>
+
+    <textarea id="markdownOutput" placeholder="Converted markdown will appear here..."></textarea>
+
+    <script src="/static/app.js"></script>
+  </body>
+</html>

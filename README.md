@@ -168,17 +168,69 @@ The output should:
 
 ---
 
-## 🛠️ Getting Started (Planned)
+## 🛠️ Getting Started
 
-    # backend
-    cd backend
-    pip install -r requirements.txt
-    uvicorn main:app --reload
+### Easiest (no manual terminal setup)
 
-    # frontend
-    cd frontend
-    npm install
-    npm run dev
+If you're on Windows, double-click `start_windows.bat` from the project folder.
+It will create a virtual environment, install dependencies, start the server, and open your browser automatically.
+
+### One-process local run (serves frontend + backend together)
+
+```bash
+cd backend
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+cd ..
+python start.py
+```
+
+Then open: `http://127.0.0.1:8000`
+
+
+### Deploy for iPad / public access (Render)
+
+This app must be deployed to a public URL to work on iPad.
+Localhost (`127.0.0.1`) only works on the same device running the server.
+
+1. Push this repo to GitHub.
+2. In Render, create a **Web Service** from the repo.
+3. Render will auto-detect `render.yaml` and build from `Dockerfile`.
+4. Once deployed, open your Render URL (for example, `https://pdf2md.onrender.com`) on iPad.
+
+Or run Docker anywhere and expose port `8000` publicly:
+
+```bash
+docker build -t pdf2md .
+docker run -p 8000:8000 pdf2md
+```
+
+Then open `http://<your-server-ip>:8000` (or HTTPS via your platform proxy).
+
+### API Contract
+
+**Endpoint:** `POST /convert`  
+**URL:** `http://127.0.0.1:8000/convert`  
+**Content-Type:** `multipart/form-data`
+
+**Request form field**
+- `file`: PDF file upload
+
+**Success response (200)**
+
+```json
+{
+  "markdown": "# Converted Markdown\n\n## Page 1...",
+  "metadata": {
+    "page_count": 12,
+    "figure_count": 0
+  }
+}
+```
+
+**Error responses**
+- `400` when non-PDF or invalid/empty file is uploaded
 
 ---
 
