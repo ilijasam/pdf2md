@@ -235,6 +235,8 @@ Then open `http://<your-server-ip>:8000` (or HTTPS via your platform proxy).
 
 UI now shows conversion-in-progress status, elapsed time, selected file size, and backend processing time/character count metadata to help diagnose slow large files.
 
+If Convert appears to do nothing, wait for the status line and elapsed timer under the buttons. On large PDFs, conversion can take time. If you still get no result, check the service logs in Render for `/convert` errors.
+
 ---
 
 ## 💡 Future Improvements

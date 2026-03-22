@@ -4,6 +4,9 @@ from io import BytesIO
 from pathlib import Path
 from typing import Any
 
+from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse, PlainTextResponse
 from io import BytesIO
 from typing import Any
 
@@ -49,6 +52,16 @@ def serve_index() -> FileResponse:
     if not index_file.exists():
         raise HTTPException(status_code=404, detail="Frontend not found.")
     return FileResponse(index_file)
+
+
+
+
+@app.get("/app.js")
+def serve_app_js() -> FileResponse | PlainTextResponse:
+    app_js = FRONTEND_DIR / "app.js"
+    if not app_js.exists():
+        return PlainTextResponse("console.error(\"app.js not found\")", media_type="application/javascript", status_code=404)
+    return FileResponse(app_js, media_type="application/javascript")
 
 
 @app.get("/health")
